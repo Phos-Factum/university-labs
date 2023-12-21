@@ -22,7 +22,7 @@ int main()
         {
             while ( (lineCount < 1) || (lineCount > 20) )
             {
-                printf("\n\033[0;31m(Error!) Count of strings shoud be '0 < x <= 20'.\033[0m\n");
+                printf("\n\033[0;31mError! Count of strings shoud be '0 < x <=                                                                         20'.\033[0m\n");
                 printf("\033[0;36mEnter count of strings: \033[0m");
                 scanf("%d", &lineCount);
             }
@@ -65,6 +65,3 @@ int main()
 
     return 0;
 }
-
-
-// Поменять местами первое и последнее слово в каждой строке. 
