@@ -1,6 +1,7 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "ctype.h"
+#include "string.h"
 
 struct Worker {
 	char name[30];
@@ -10,30 +11,79 @@ struct Worker {
 	char year;
 	};
 
+void checkingString(char *arg, char workers)
+{
+    char text[20];
+    fflush(stdin);
+    fputs(" ", stdout);
+    if ( fgets(text, sizeof text, stdin) ) 
+    {
+        int number;
+        if ( sscanf(text, "%d", &number) == 1 ) 
+        {
+            while ( sscanf(text, "%d", &number) == 1 )
+            {
+                printf("\n(Error!) You've wrote not a string! \n", text);
+                fflush(stdin);
+                fputs("Try again: ", stdout);
+                fgets(text, sizeof text, stdin);
+            }   
+            printf("\n");
+        }
+        else
+        {
+        }
+    }
+}
+
+void checkingNumber(char *arg, char workers)
+{
+    char text[20];
+    fflush(stdin);
+    fputs(" ", stdout);
+    if ( fgets(text, sizeof text, stdin) ) 
+    {
+        int number;
+        if (sscanf(text, "%d", &number) != 1) 
+        {
+            while (sscanf(text, "%d", &number) != 1)
+            {
+                printf("\n(Error!) You've wrote not a number! \n", text);
+                fflush(stdin);
+                fputs("Try again: ", stdout);
+                fgets(text, sizeof text, stdin);
+            }   
+            printf("\n");   
+        }
+    }
+}
+
 void inputWorker(struct Worker *workers, int n) 
 {
     for (int i = 0; i < n; i++) 
     {
+        char arg[20];
         printf("\n\033[0;32mInfo about worker %d:\033[0m\n", i + 1);
-        printf("First name: ");
-        scanf("%s", workers[i].name);
+        printf("First name:");
+        strcpy(arg, "first name");
+        checkingString(arg, *workers[i].name);
+        workers[i].name =
 
-        printf("Family name: ");
-        scanf("%s", workers[i].famName);
-        printf("Surname: ");
-        scanf("%s", workers[i].surName);
-        printf("Post: ");
-        scanf("%s", workers[i].post);
-        printf("Year: ");
-        scanf("%c ", &workers[i].year);
-        // if ( ((workers[i].year - '0') < '0') || ((workers[i].year - '0') > '9') ) 
-        // {
-        //     while ( ((workers[i].year - '0') < '0') || ((workers[i].year - '0') > '9') ) 
-        //     {
-        //         printf("\nFake! Try again: ");
-        //         scanf("%c ", &workers[i].year);
-        //     }
-        // } 
+        printf("\nFamily name:");
+        strcpy(arg, "family name");
+        checkingString(arg, *workers[i].famName);
+
+        printf("\nFamily name:");
+        strcpy(arg, "surname");
+        checkingString(arg, *workers[i].surName);
+
+        printf("\nPost:");
+        strcpy(arg, "post");
+        checkingString(arg, *workers[i].post);
+
+        printf("\nYear:");
+        strcpy(arg, "post");
+        checkingNumber(arg, workers[i].year);
     }
 }
 
@@ -45,7 +95,7 @@ void display(struct Worker *workers, int n, int k)
             printf("First name: %s,\nFamily Name: %s,\n" 
            	"Surname: %s,\nPost: %s,\nYear: %s.\n",
             workers[i].name, workers[i].famName, workers[i].surName,
-            workers[i].post, workers[i].year);
+            workers[i].post, &workers[i].year);
             printf("\n");
         }
     }
