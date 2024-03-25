@@ -24,7 +24,7 @@ void rearrangeWords(char **lines, int lineCount)
                 spaces++;
             }
         }
-        printf("%d", spaces);
+        printf("%d ", spaces);
 
         word = strtok(line, " ");             // разделить по строкам  
         firstWord[i] = word;

@@ -75,7 +75,7 @@ void display(struct Worker *workers, int n, int k)
         if (workers[i].year >= k) 
         {   
             printf("First name: %sFamily Name: %s" 
-           	"Surname: %sPost: %sYear: %d",
+           	"Surname: %sPost: %sYear: %d\n\n",
             workers[i].name, workers[i].famName, workers[i].surName,
             workers[i].post, workers[i].year);
         }

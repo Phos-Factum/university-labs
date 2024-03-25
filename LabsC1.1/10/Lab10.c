@@ -26,7 +26,7 @@ int main()
         	break;
         }
 
-        // Creatring an array of structures and memory allocating
+        // Creating an array of structures and memory allocating
         struct Worker *workers = (struct Worker*)malloc(n * sizeof(struct Worker));
         if (workers == NULL) 
         {
