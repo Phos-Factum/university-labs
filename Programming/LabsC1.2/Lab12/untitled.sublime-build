@@ -1,0 +1,13 @@
+{
+	"cmd": ["gcc", "${file}", "-o", "${file_path}/${file_base_name}.exe", "-I", "путь_к_папке_с_заголовочными_файлами_SDL", "-L", "путь_к_библиотекам_SDL", "-lmingw32", "-lSDL2main", "-lSDL2", "-lSDL2_image"],
+    "selector": "source.c",
+    "shell": true,
+    "working_dir": "${file_path}",
+    "variants":
+    [
+        {
+            "name": "Run",
+            "cmd": ["gcc", "${file}", "-o", "${file_path}/${file_base_name}.exe", "-I", "путь_к_папке_с_заголовочными_файлами_SDL", "-L", "путь_к_библиотекам_SDL", "-lmingw32", "-lSDL2main", "-lSDL2", "-lSDL2_image", "&&", "${file_path}/${file_base_name}.exe"]
+        }
+    ]
+}
