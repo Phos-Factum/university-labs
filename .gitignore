@@ -1,0 +1,4 @@
+# Ignored files
+
+# Python pycache directories
+__pycache__/
