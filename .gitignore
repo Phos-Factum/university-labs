@@ -1,4 +1,10 @@
 # Ignored files
 
-# Python pycache directories
+# Python cache files
 __pycache__/
+
+# Standart error stream (2>)
+er?
+
+# Materials
+Materials/
