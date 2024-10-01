@@ -11,3 +11,6 @@ Materials/
 
 # Compiled and executable files
 *.out
+
+# Documentation
+*.docx 
