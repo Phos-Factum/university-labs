@@ -106,7 +106,7 @@ public:
 int main() {
     // Create two rational numbers
     Rational r1(2, 5);  // 2/5
-    Rational r2(3, 7);  // 3/7
+    Rational r2(6, 8);  // 3/7
 
     // Display the original rational numbers
     std::cout << "Rational number 1: ";

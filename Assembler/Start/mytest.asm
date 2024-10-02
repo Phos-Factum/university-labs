@@ -27,7 +27,7 @@ main:
 	mov rax, 1
 	mov rdi, 1
 	mov rsi, msg
-	movzx rdx, byte [len]
+	movzx rdx, byte [len1]
 	syscall
 
 ; output with a 'printf'
