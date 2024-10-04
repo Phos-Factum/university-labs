@@ -1,7 +1,9 @@
 # Ignored files
 
-# Python cache files
+# Python
+env/
 __pycache__/
+.vscode/
 
 # Standart error stream (2>)
 er?
@@ -11,6 +13,10 @@ Materials/
 
 # Compiled and executable files
 *.out
+*.exe
 
-# Documentation
+# Documentation and archives
 *.docx 
+*.pdf
+*.odt
+*.zip
