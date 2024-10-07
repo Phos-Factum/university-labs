@@ -1,61 +1,51 @@
-section .data
-    msg_error db "Ошибка: деление на ноль", 10, 0
-    format db "%lld", 0        ; Формат для вывода
-
-section .bss
-    numerator resq 1           ; Числитель (64 бита)
-    denominator resq 1         ; Знаменатель (64 бита)
-    result resq 1              ; Результат (64 бита)
+; signed.asm
 
 section .text
-    extern printf
-    extern scanf
-    global calc_signed_expression
+global signed_calc
 
-calc_signed_expression:
-    ; Входные данные: a (signed char), b (signed char), d (signed int)
-    ; Подготовка для работы
-    movsx rax, byte [rdi]       ; Загружаем a (signed char)
-    test rax, rax                ; Проверка a на 0
-    jz divide_by_zero            ; Если a == 0, переход на обработку деления на ноль
+signed_calc:
+    ; Параметры:
+    ; rdi - d_signed (16-bit), rsi - a_signed (8-bit), rdx - b_signed (8-bit)
 
-    movsx rbx, byte [rsi]       ; Загружаем b (signed char)
-    test rbx, rbx                ; Проверка b на 0
-    jz divide_by_zero            ; Если b == 0, переход на обработку деления на ноль
+    ; Расчёт числителя: 2 * d_signed - 96 / a_signed
+    movsx rdi, di              ; Загрузить 16-битное signed значение d_signed и расширить до 64 бит
+    movsx rsi, sil             ; Загрузить 8-битное signed значение a_signed и расширить до 64 бит
+    mov rax, rdi               ; rax = d_signed
+    shl rax, 1                 ; rax = 2 * d_signed
 
-    movsx rcx, dword [rdx]      ; Загружаем d (signed int) в rcx
-    shl rcx, 1                   ; 2 * d
-    mov rax, 96                  ; Загружаем 96
-    cqo                           ; Расширяем rax
-    idiv rax                     ; 96 / a
-    sub rcx, rax                 ; 2 * d - (96 / a)
+    ; Проверка деления на 0
+    cmp rsi, 0                 
+    je division_by_zero_error   ; Если a_signed == 0, переход на обработчик ошибки
 
-    ; Знаменатель: (34 / b) - a + 1
-    mov rax, 34                  ; Загружаем 34
-    xor rdx, rdx                 ; Обнуляем rdx для деления
-    movsx rbx, byte [rsi]        ; Заносим b снова
-    idiv rbx                     ; 34 / b
-    sub rax, rdi                 ; (34 / b) - a
-    add rax, 1                   ; +1
+    mov rbx, 96
+    cqo                        ; Подготовка к делению
+    idiv rsi                   ; 96 / a_signed (rsi - 64-битное значение)
+    sub rax, rbx               ; 2 * d_signed - 96 / a_signed
 
-    test rax, rax                ; Проверка на 0 в знаменателе
-    jz divide_by_zero            ; Если знаменатель равен 0, переход на обработку деления на ноль
+    ; Сохраняем результат числителя
+    push rax
 
-    ; Деление
-    mov rdx, rcx                 ; Восстанавливаем числитель (2 * d - (96 / a))
-    cqo                           ; Расширяем rdx:rax для деления
-    idiv rax                     ; Делим числитель на знаменатель
+    ; Расчёт знаменателя: 34 / b_signed - a_signed + 1
+    mov rax, 34
+    movsx rdx, dl              ; Загрузить 8-битное signed значение b_signed и расширить до 64 бит
 
-    ; Сохранение результатов
-    mov [numerator], rdx        ; Сохраняем числитель (64 бита)
-    mov [denominator], rax       ; Сохраняем знаменатель (64 бита)
-    mov [result], rax            ; Сохраняем результат (64 бита)
+    ; Проверка деления на 0
+    cmp rdx, 0                 
+    je division_by_zero_error   ; Если b_signed == 0, переход на обработчик ошибки
 
+    cqo                        ; Подготовка к делению
+    idiv rdx                   ; 34 / b_signed
+    sub rax, rsi               ; 34 / b_signed - a_signed
+    add rax, 1                 ; +1
+
+    ; Возвращаем числитель и знаменатель через rax и rdx
+    pop rdx                    ; rdx = числитель
     ret
 
-divide_by_zero:
-    mov rdi, msg_error
-    call printf                  ; Вывод сообщения
-    xor rax, rax                 ; Возвращаем 0 в случае ошибки
+division_by_zero_error:
+    ; Обработка ошибки деления на 0
+    ; Можно, например, установить флаг ошибки или вернуть 0
+    xor rax, rax               ; Устанавливаем rax = 0 как признак ошибки
     ret
+
 

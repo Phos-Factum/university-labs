@@ -1,64 +1,49 @@
-section .data
-    msg_error db "Ошибка: деление на ноль", 10, 0
-    format db "%llu", 0         ; Формат для вывода
-
-section .bss
-    numerator resq 1            ; Числитель (64 бита)
-    denominator resq 1          ; Знаменатель (64 бита)
-    result resq 1               ; Результат (64 бита)
+; unsigned.asm
 
 section .text
-    extern printf
-    extern scanf
-    global calc_unsigned_expression
+global unsigned_calc
 
-calc_unsigned_expression:
-    ; Входные данные: a (unsigned char), b (unsigned char), d (unsigned int)
-    ; Подготовка для работы
-    movzx rax, byte [rdi]       ; Загружаем a (unsigned char)
-    test rax, rax                ; Проверка a на 0
-    jz divide_by_zero            ; Если a == 0, переход на обработку деления на ноль
+unsigned_calc:
+    ; Параметры:
+    ; rdi - d_unsigned (16-bit), rsi - a_unsigned (8-bit), rdx - b_unsigned (8-bit)
 
-    movzx rbx, byte [rsi]       ; Загружаем b (unsigned char)
-    test rbx, rbx                ; Проверка b на 0
-    jz divide_by_zero            ; Если b == 0, переход на обработку деления на ноль
+    ; Расчёт числителя: 2 * d_unsigned - 96 / a_unsigned
+    movzx rdi, di              ; Загрузить 16-битное unsigned значение d_unsigned и расширить до 64 бит
+    movzx rsi, sil             ; Загрузить 8-битное unsigned значение a_unsigned и расширить до 64 бит
+    mov rax, rdi               ; rax = d_unsigned
+    shl rax, 1                 ; rax = 2 * d_unsigned
 
-    mov rdx, dword [rdx]        ; Загружаем d (unsigned int)
-    shl rdx, 1                   ; 2 * d
-    mov rax, 96                  ; Загружаем 96
-    xor rdx, rdx                 ; Обнуляем rdx для деления
-    mov rax, 96                  ; Загружаем 96 (перезапись rax, убираем лишнюю строку)
-    div rax                      ; 96 / a
-    sub rdx, rax                 ; 2 * d - (96 / a)
+    ; Проверка деления на 0
+    cmp rsi, 0                 
+    je division_by_zero_error   ; Если a_unsigned == 0, переход на обработчик ошибки
 
-    ; Знаменатель: (34 / b) - a + 1
-    mov rax, 34                  ; Загружаем 34
-    xor rdx, rdx                 ; Обнуляем rdx для деления
-    movzx rbx, byte [rsi]        ; Заносим b снова
-    xor rdx, rdx                 ; Обнуляем rdx перед делением
-    div rbx                      ; 34 / b
-    sub rax, rdi                 ; (34 / b) - a
-    add rax, 1                   ; +1
+    mov rbx, 96
+    xor rdx, rdx               ; Очистить RDX перед unsigned делением
+    div rsi                    ; 96 / a_unsigned
+    sub rax, rbx               ; 2 * d_unsigned - 96 / a_unsigned
 
-    test rax, rax                ; Проверка на 0 в знаменателе
-    jz divide_by_zero            ; Если знаменатель равен 0, переход на обработку деления на ноль
+    ; Сохраняем результат числителя
+    push rax
 
-    ; Деление
-    mov rdx, rdx                 ; Восстанавливаем числитель (предыдущий результат)
-    cqo                           ; Расширяем rdx:rax для деления
-    mov rax, [numerator]         ; Загружаем числитель для деления
-    div rax                      ; Делим числитель на знаменатель
+    ; Расчёт знаменателя: 34 / b_unsigned - a_unsigned + 1
+    mov rax, 34
+    movzx rdx, dl              ; Загрузить 8-битное unsigned значение b_unsigned и расширить до 64 бит
 
-    ; Сохранение результатов
-    mov [numerator], rdx        ; Сохраняем числитель (64 бита)
-    mov [denominator], rax       ; Сохраняем знаменатель (64 бита)
-    mov [result], rax            ; Сохраняем результат (64 бита)
+    ; Проверка деления на 0
+    cmp rdx, 0                 
+    je division_by_zero_error   ; Если b_unsigned == 0, переход на обработчик ошибки
 
+    xor rdx, rdx               ; Очистить RDX перед unsigned делением
+    div rdx                    ; 34 / b_unsigned
+    sub rax, rsi               ; 34 / b_unsigned - a_unsigned
+    add rax, 1                 ; +1
+
+    ; Возвращаем числитель и знаменатель через rax и rdx
+    pop rdx                    ; rdx = числитель
     ret
 
-divide_by_zero:
-    mov rdi, msg_error          ; Сообщение об ошибке
-    call printf                  ; Вывод сообщения
-    xor rax, rax                 ; Возвращаем 0 в случае ошибки
+division_by_zero_error:
+    ; Обработка ошибки деления на 0
+    xor rax, rax               ; Устанавливаем rax = 0 как признак ошибки
     ret
 

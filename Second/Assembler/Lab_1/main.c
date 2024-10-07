@@ -1,52 +1,153 @@
+// main.c
+
 #include <stdio.h>
+#include <stdint.h>
+#include <stdlib.h>
+#include <limits.h>
 
-extern void calc_signed_expression(char a, char b, int d);
-extern void calc_unsigned_expression(unsigned char a, unsigned char b, unsigned int d); // Исправлено
+// Объявление ассемблерных функций
+//extern long unsigned_calc(uint16_t d_unsigned, uint8_t a_unsigned, uint8_t b_unsigned);
+//extern unsigned long signed_calc(int16_t d_signed, int8_t a_signed, int8_t b_signed);
 
-long long numerator;
-long long denominator;
-long long result;
+// Ввод и валидация для signed данных
+void input_and_validate_signed(int8_t *a, int8_t *b, int16_t *d) {
+    int temp;
+    do {
+        printf("Enter signed char value for 'a' (-128 to 127): ");
+        if (scanf("%d", &temp) != 1 || temp < -128 || temp > 127) {
+            printf("Invalid input. Please enter a value in range -128 to 127.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *a = (int8_t)temp;
+            break;
+        }
+    } while (1);
+
+    do {
+        printf("Enter signed char value for 'b' (-128 to 127): ");
+        if (scanf("%d", &temp) != 1 || temp < -128 || temp > 127) {
+            printf("Invalid input. Please enter a value in range -128 to 127.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *b = (int8_t)temp;
+            break;
+        }
+    } while (1);
+
+    do {
+        printf("Enter signed 16-bit integer for 'd' (-32768 to 32767): ");
+        if (scanf("%d", &temp) != 1 || temp < -32768 || temp > 32767) {
+            printf("Invalid input. Please enter a value in range -32768 to 32767.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *d = (int16_t)temp;
+            break;
+        }
+    } while (1);
+}
+
+// Ввод и валидация для unsigned данных
+void input_and_validate_unsigned(uint8_t *a, uint8_t *b, uint16_t *d) {
+    int temp;
+    do {
+        printf("Enter unsigned char value for 'a' (0 to 255): ");
+        if (scanf("%d", &temp) != 1 || temp < 0 || temp > 255) {
+            printf("Invalid input. Please enter a value in range 0 to 255.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *a = (uint8_t)temp;
+            break;
+        }
+    } while (1);
+
+    do {
+        printf("Enter unsigned char value for 'b' (0 to 255): ");
+        if (scanf("%d", &temp) != 1 || temp < 0 || temp > 255) {
+            printf("Invalid input. Please enter a value in range 0 to 255.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *b = (uint8_t)temp;
+            break;
+        }
+    } while (1);
+
+    do {
+        printf("Enter unsigned 16-bit integer for 'd' (0 to 65535): ");
+        if (scanf("%d", &temp) != 1 || temp < 0 || temp > 65535) {
+            printf("Invalid input. Please enter a value in range 0 to 65535.\n");
+            while (getchar() != '\n'); // Очистка буфера ввода
+        } else {
+            *d = (uint16_t)temp;
+            break;
+        }
+    } while (1);
+}
+
+// Функция для проверки деления на ноль и переполнения
+void check_division_and_overflow(int32_t numerator, int32_t denominator) {
+    if (denominator == 0) {
+        printf("\nError: Division by zero detected. Program will terminate.\n");
+        exit(EXIT_FAILURE); // Завершение программы с ошибкой
+    }
+    // Проверка на переполнение
+    if ((numerator == INT32_MIN && denominator == -1) || (numerator > INT32_MAX || numerator < INT32_MIN)) {
+        printf("\nError: Integer overflow detected. Program will terminate.\n");
+        exit(EXIT_FAILURE); // Завершение программы с ошибкой
+    }
+}
 
 int main() {
-    // Знакованные данные
-    char a_signed, b_signed;
-    int d_signed;
+    int8_t a_signed, b_signed;
+    int16_t d_signed;
+    uint8_t a_unsigned, b_unsigned;
+    uint16_t d_unsigned;
 
-    printf("Введите a (signed char, -128 до 127): ");
-    scanf("%hhd", &a_signed);
+    int32_t signed_numerator, signed_denominator, signed_result;
+    uint32_t unsigned_numerator, unsigned_denominator, unsigned_result;
 
-    printf("Введите b (signed char, -128 до 127): ");
-    scanf("%hhd", &b_signed);
 
-    printf("Введите d (signed int): ");
-    scanf("%d", &d_signed);
+    // Ввод и валидация для signed данных
+    printf("Input values for signed data:\n");
+    input_and_validate_signed(&a_signed, &b_signed, &d_signed);
 
-    // Вызов функции на ассемблере
-    calc_signed_expression(a_signed, b_signed, d_signed);
-    printf("Знаковые данные:\n");
-    printf("Числитель: %lld\n", numerator);
-    printf("Знаменатель: %lld\n", denominator);
-    printf("Результат: %lld\n", result);
+    // Ввод и валидация для unsigned данных
+    printf("\nInput values for unsigned data:\n");
+    input_and_validate_unsigned(&a_unsigned, &b_unsigned, &d_unsigned); 
 
-    // Беззнаковые данные
-    unsigned char a_unsigned, b_unsigned;
-    unsigned int d_unsigned;
+    // Проверка, чтобы избежать деления на ноль
+    if (a_signed == 0 || b_signed == 0) {
+        printf("\nError: Division by zero detected in signed values. Program will terminate.\n");
+        return 0;
+    }
 
-    printf("Введите a (unsigned char, 0 до 255): ");
-    scanf("%hhu", &a_unsigned);
+    if (a_unsigned == 0 || b_unsigned == 0) {
+        printf("\nError: Division by zero detected in unsigned values. Program will terminate.\n");
+        return 0;
+    }
 
-    printf("Введите b (unsigned char, 0 до 255): ");
-    scanf("%hhu", &b_unsigned);
+    // Расчёты для программы на C
+    signed_numerator = (2 * d_signed - 96 / a_signed);
+    signed_denominator = (34 / b_signed - a_signed + 1);
+    check_division_and_overflow(signed_numerator, signed_denominator); // Проверка на ноль и переполнение
+    signed_result = signed_numerator / signed_denominator;
 
-    printf("Введите d (unsigned int): ");
-    scanf("%u", &d_unsigned);
+    unsigned_numerator = (2 * d_unsigned - 96 / a_unsigned);
+    unsigned_denominator = (34 / b_unsigned - a_unsigned + 1);
+    check_division_and_overflow(unsigned_numerator, unsigned_denominator); // Проверка на ноль и переполнение
+    unsigned_result = unsigned_numerator / unsigned_denominator;
 
-    // Вызов функции на ассемблере
-    calc_unsigned_expression(a_unsigned, b_unsigned, d_unsigned);
-    printf("Беззнаковые данные:\n");
-    printf("Числитель: %lld\n", numerator);
-    printf("Знаменатель: %lld\n", denominator);
-    printf("Результат: %lld\n", result);
+    // Вызов ассемблерных функций
+    //long signed_output = signed_calc(d_signed, a_signed, b_signed);
+    //unsigned long unsigned_output = unsigned_calc(d_unsigned, a_unsigned, b_unsigned);
+
+    // Вывод значений, посчитанных в программе на C
+    printf("\nC program results for signed values:\n");
+    printf("Numerator = %d, Denominator = %d, Result = %d\n", signed_numerator, signed_denominator, signed_result);
+    //printf("Assembler results for signed values: %ld\n", signed_output);
+
+    printf("\nC program results for unsigned values:\n");
+    printf("Numerator = %u, Denominator = %u, Result = %u\n", unsigned_numerator, unsigned_denominator, unsigned_result);
+    //printf("Assembler results for unsigned values: %ld\n", unsigned_output);
 
     return 0;
 }
