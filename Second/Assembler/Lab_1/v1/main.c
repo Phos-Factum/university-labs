@@ -5,9 +5,8 @@
 #include <stdlib.h>
 #include <limits.h>
 
-// Объявление ассемблерных функций
-//extern long unsigned_calc(uint16_t d_unsigned, uint8_t a_unsigned, uint8_t b_unsigned);
-//extern unsigned long signed_calc(int16_t d_signed, int8_t a_signed, int8_t b_signed);
+// Объявление ассемблерной функции
+extern long signed_unsigned_calc(int16_t d, int8_t a, int8_t b, int type);
 
 // Ввод и валидация для signed данных
 void input_and_validate_signed(int8_t *a, int8_t *b, int16_t *d) {
@@ -105,7 +104,6 @@ int main() {
     int32_t signed_numerator, signed_denominator, signed_result;
     uint32_t unsigned_numerator, unsigned_denominator, unsigned_result;
 
-
     // Ввод и валидация для signed данных
     printf("Input values for signed data:\n");
     input_and_validate_signed(&a_signed, &b_signed, &d_signed);
@@ -126,28 +124,29 @@ int main() {
     }
 
     // Расчёты для программы на C
-    signed_numerator = (2 * d_signed - 96 / a_signed);
-    signed_denominator = (34 / b_signed - a_signed + 1);
+    signed_numerator = (2 * d_signed - (96 / a_signed)); // Убедитесь, что деление идёт как ожидалось
+    signed_denominator = ((34 / b_signed) - a_signed + 1); // Используйте скобки для ясности
     check_division_and_overflow(signed_numerator, signed_denominator); // Проверка на ноль и переполнение
     signed_result = signed_numerator / signed_denominator;
 
-    unsigned_numerator = (2 * d_unsigned - 96 / a_unsigned);
-    unsigned_denominator = (34 / b_unsigned - a_unsigned + 1);
+    unsigned_numerator = (2 * d_unsigned - (96 / a_unsigned));
+    unsigned_denominator = ((34 / b_unsigned) - a_unsigned + 1);
     check_division_and_overflow(unsigned_numerator, unsigned_denominator); // Проверка на ноль и переполнение
     unsigned_result = unsigned_numerator / unsigned_denominator;
 
-    // Вызов ассемблерных функций
-    //long signed_output = signed_calc(d_signed, a_signed, b_signed);
-    //unsigned long unsigned_output = unsigned_calc(d_unsigned, a_unsigned, b_unsigned);
+    // Вызов ассемблерной функции для знаковых значений
+    long signed_output = signed_unsigned_calc(d_signed, a_signed, b_signed, 1); // Тип 1 для signed
+    // Вызов ассемблерной функции для беззнаковых значений
+    long unsigned_output = signed_unsigned_calc(d_unsigned, a_unsigned, b_unsigned, 0); // Тип 0 для unsigned
 
     // Вывод значений, посчитанных в программе на C
     printf("\nC program results for signed values:\n");
     printf("Numerator = %d, Denominator = %d, Result = %d\n", signed_numerator, signed_denominator, signed_result);
-    //printf("Assembler results for signed values: %ld\n", signed_output);
+    printf("Assembler results for signed values: %ld\n", signed_output);
 
     printf("\nC program results for unsigned values:\n");
     printf("Numerator = %u, Denominator = %u, Result = %u\n", unsigned_numerator, unsigned_denominator, unsigned_result);
-    //printf("Assembler results for unsigned values: %ld\n", unsigned_output);
+    printf("Assembler results for unsigned values: %ld\n", unsigned_output);
 
     return 0;
 }

@@ -20,3 +20,7 @@ Materials/
 *.pdf
 *.odt
 *.zip
+
+# Backup directories and files
+*.bac 
+Backup/
