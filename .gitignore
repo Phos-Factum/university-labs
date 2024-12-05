@@ -17,6 +17,7 @@ Materials/
 
 # Documentation and archives
 *.docx 
+*.doc
 *.pdf
 *.odt
 *.zip
