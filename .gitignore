@@ -9,20 +9,17 @@ __pycache__/
 er?
 
 # Materials
-Materials/
+Manuals/
 
 # Compiled and executable files
 *.out
 *.exe
 
-# Documentation and archives
-*.docx 
-*.doc
-*.pdf
-*.odt
+# Archives
 *.zip
 
 # Backup directories and files
 *.bac 
 Backup/
+build/
 
