@@ -1,2 +1,0 @@
-ALTER TABLE Files
-ADD COLUMN file_body TEXT;

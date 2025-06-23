@@ -1,2 +1,0 @@
-ALTER TABLE Files
-DROP COLUMN file_body;
